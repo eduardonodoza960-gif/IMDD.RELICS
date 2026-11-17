@@ -70,6 +70,10 @@ jobs:
           # apaga pastas que ficaram vazias
           find . -type d -empty -delete
 
+      - name: Remover import de pacote inexistente (render.description)
+        run: |
+          grep -rl "net.minecraft.client.render.description" "$MOD_DIR/src" | xargs -r sed -i '/^import net\.minecraft\.client\.render\.description\./d'
+
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
