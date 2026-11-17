@@ -51,6 +51,10 @@ jobs:
           fi
           echo "RelicType.java:"; sed -n 1,30p "$F"
 
+      - name: Corrigir import errado do Mixin (assets -> asm)
+        run: |
+          grep -rl "org.spongepowered.assets.mixin" "$MOD_DIR/src" | xargs -r sed -i 's/org\.spongepowered\.assets\.mixin/org.spongepowered.asm.mixin/g'
+
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
