@@ -29,6 +29,20 @@ jobs:
         run: |
           grep -rl "net.minecraft.text.Formatting" "$MOD_DIR/src" | xargs -r sed -i 's/net\.minecraft\.text\.Formatting/net.minecraft.util.Formatting/g'
 
+      - name: Corrigir imports faltando (LivingEntityMixin)
+        run: |
+          F=$(find "$MOD_DIR/src" -name LivingEntityMixin.java | head -n 1)
+          if [ -n "$F" ]; then
+            for IMP in \
+              "org.spongepowered.asm.mixin.injection.callback.CallbackInfo" \
+              "net.minecraft.entity.Entity" \
+              "net.minecraft.util.math.Vec3d"; do
+              grep -q "^import $IMP;" "$F" || sed -i "0,/^package .*;/s//&\n\nimport $IMP;/" "$F"
+            done
+            echo "Imports conferidos em: $F"
+            sed -n 1,12p "$F"
+          fi
+
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
