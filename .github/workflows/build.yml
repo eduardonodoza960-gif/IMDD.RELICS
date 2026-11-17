@@ -55,6 +55,21 @@ jobs:
         run: |
           grep -rl "org.spongepowered.assets.mixin" "$MOD_DIR/src" | xargs -r sed -i 's/org\.spongepowered\.assets\.mixin/org.spongepowered.asm.mixin/g'
 
+      - name: Remover arquivos .java duplicados (pasta fora do pacote)
+        run: |
+          cd "$MOD_DIR/src/main/java"
+          find . -name '*.java' | while read -r f; do
+            PKG=$(grep -m1 '^package ' "$f" | sed 's/package //; s/;.*//; s/\./\//g')
+            DIR=$(dirname "$f" | sed 's#^\./##')
+            CORRETO="$PKG/$(basename "$f")"
+            if [ -n "$PKG" ] && [ "$PKG" != "$DIR" ] && [ -f "$CORRETO" ]; then
+              echo "Removendo duplicado: $f (o certo e $CORRETO)"
+              rm -f "$f"
+            fi
+          done
+          # apaga pastas que ficaram vazias
+          find . -type d -empty -delete
+
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
